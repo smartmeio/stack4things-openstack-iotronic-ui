@@ -33,10 +33,9 @@ Copy the Iotronic API and enable the plugin in Horizon::
 
 To add the zones it is necessary to modify the file /etc/openstack-dashboard/local_settings.py according to::
 
-IOTRONIC_ZONES={'zone-1',
-                'zone-2',
-                'zone-3'
-}
+
+IOTRONIC_ZONES={'zone-1', 'zone-2', 'zone-3'}
+
 
 To run horizon with the newly enabled IoTronic Panels plugin restart apache::
 
