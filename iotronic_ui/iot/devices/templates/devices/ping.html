@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Ping" %}{% endblock %}
+
+{% block main %}
+    {% include 'iot/devices/_ping.html' %}
+{% endblock %}

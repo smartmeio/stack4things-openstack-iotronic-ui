@@ -86,7 +86,7 @@ class CallPluginLink(tables.LinkAction):
 
 class RemovePluginLink(tables.LinkAction):
     name = "remove"
-    verbose_name = _("Remove Plugin from board(s)")
+    verbose_name = _("Remove Plugin from device(s)")
     url = "horizon:iot:plugins:remove"
     classes = ("ajax-modal",)
     icon = "plus"

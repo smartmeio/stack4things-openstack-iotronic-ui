@@ -93,11 +93,11 @@ class InjectPluginForm(forms.SelfHandlingForm):
 
     onboot = forms.BooleanField(label=_("On Boot"), required=False)
 
-    board_list = forms.MultipleChoiceField(
-        label=_("Boards List"),
+    device_list = forms.MultipleChoiceField(
+        label=_("Devices List"),
         widget=forms.SelectMultiple(
             attrs={'class': 'switchable', 'data-slug': 'slug-inject-plugin'}),
-        help_text=_("Select boards in this pool ")
+        help_text=_("Select devices in this pool ")
     )
 
     def __init__(self, *args, **kwargs):
@@ -105,18 +105,18 @@ class InjectPluginForm(forms.SelfHandlingForm):
         super(InjectPluginForm, self).__init__(*args, **kwargs)
         # input=kwargs.get('initial',{})
 
-        boardslist_length = len(kwargs["initial"]["board_list"])
+        deviceslist_length = len(kwargs["initial"]["device_list"])
 
-        self.fields["board_list"].choices = kwargs["initial"]["board_list"]
-        self.fields["board_list"].max_length = boardslist_length
+        self.fields["device_list"].choices = kwargs["initial"]["device_list"]
+        self.fields["device_list"].max_length = deviceslist_length
 
     def handle(self, request, data):
 
         counter = 0
 
-        for board in data["board_list"]:
-            for key, value in self.fields["board_list"].choices:
-                if key == board:
+        for device in data["device_list"]:
+            for key, value in self.fields["device_list"].choices:
+                if key == device:
 
                     try:
                         inject = iotronic.plugin_inject(request, key,
@@ -126,13 +126,13 @@ class InjectPluginForm(forms.SelfHandlingForm):
                         message_text = inject
                         messages.success(request, _(message_text))
 
-                        if counter != len(data["board_list"]) - 1:
+                        if counter != len(data["device_list"]) - 1:
                             counter += 1
                         else:
                             return True
 
                     except Exception:
-                        message_text = "Unable to inject plugin on board " \
+                        message_text = "Unable to inject plugin on device " \
                                        + str(value) + "."
                         exceptions.handle(request, _(message_text))
 
@@ -148,12 +148,12 @@ class StartPluginForm(forms.SelfHandlingForm):
         widget=forms.TextInput(attrs={'readonly': 'readonly'})
     )
 
-    board_list = forms.MultipleChoiceField(
-        label=_("Boards List"),
+    device_list = forms.MultipleChoiceField(
+        label=_("Devices List"),
         widget=forms.SelectMultiple(
             attrs={'class': 'switchable',
-                   'data-slug': 'slug-start-boards'}),
-        help_text=_("Select boards in this pool ")
+                   'data-slug': 'slug-start-devices'}),
+        help_text=_("Select devices in this pool ")
     )
 
     parameters = forms.CharField(
@@ -170,10 +170,10 @@ class StartPluginForm(forms.SelfHandlingForm):
         super(StartPluginForm, self).__init__(*args, **kwargs)
         # input=kwargs.get('initial',{})
 
-        boardslist_length = len(kwargs["initial"]["board_list"])
+        deviceslist_length = len(kwargs["initial"]["device_list"])
 
-        self.fields["board_list"].choices = kwargs["initial"]["board_list"]
-        self.fields["board_list"].max_length = boardslist_length
+        self.fields["device_list"].choices = kwargs["initial"]["device_list"]
+        self.fields["device_list"].max_length = deviceslist_length
 
     def handle(self, request, data):
 
@@ -184,9 +184,9 @@ class StartPluginForm(forms.SelfHandlingForm):
         else:
             data["parameters"] = json.loads(data["parameters"])
 
-        for board in data["board_list"]:
-            for key, value in self.fields["board_list"].choices:
-                if key == board:
+        for device in data["device_list"]:
+            for key, value in self.fields["device_list"].choices:
+                if key == device:
 
                     try:
                         action = iotronic.plugin_action(request, key,
@@ -197,13 +197,13 @@ class StartPluginForm(forms.SelfHandlingForm):
                         message_text = action
                         messages.success(request, _(message_text))
 
-                        if counter != len(data["board_list"]) - 1:
+                        if counter != len(data["device_list"]) - 1:
                             counter += 1
                         else:
                             return True
 
                     except Exception:
-                        message_text = "Unable to start plugin on board " \
+                        message_text = "Unable to start plugin on device " \
                                        + str(value) + "."
                         exceptions.handle(request, _(message_text))
 
@@ -225,11 +225,11 @@ class StopPluginForm(forms.SelfHandlingForm):
         help_text=_("OPTIONAL: seconds to wait before stopping the plugin")
     )
 
-    board_list = forms.MultipleChoiceField(
-        label=_("Boards List"),
+    device_list = forms.MultipleChoiceField(
+        label=_("Devices List"),
         widget=forms.SelectMultiple(
-            attrs={'class': 'switchable', 'data-slug': 'slug-stop-boards'}),
-        help_text=_("Select boards in this pool ")
+            attrs={'class': 'switchable', 'data-slug': 'slug-stop-devices'}),
+        help_text=_("Select devices in this pool ")
     )
 
     def __init__(self, *args, **kwargs):
@@ -237,10 +237,10 @@ class StopPluginForm(forms.SelfHandlingForm):
         super(StopPluginForm, self).__init__(*args, **kwargs)
         # input=kwargs.get('initial',{})
 
-        boardslist_length = len(kwargs["initial"]["board_list"])
+        deviceslist_length = len(kwargs["initial"]["device_list"])
 
-        self.fields["board_list"].choices = kwargs["initial"]["board_list"]
-        self.fields["board_list"].max_length = boardslist_length
+        self.fields["device_list"].choices = kwargs["initial"]["device_list"]
+        self.fields["device_list"].max_length = deviceslist_length
 
     def handle(self, request, data):
 
@@ -251,9 +251,9 @@ class StopPluginForm(forms.SelfHandlingForm):
         else:
             data["delay"] = {"delay": data["delay"]}
 
-        for board in data["board_list"]:
-            for key, value in self.fields["board_list"].choices:
-                if key == board:
+        for device in data["device_list"]:
+            for key, value in self.fields["device_list"].choices:
+                if key == device:
 
                     try:
                         action = iotronic.plugin_action(request, key,
@@ -264,13 +264,13 @@ class StopPluginForm(forms.SelfHandlingForm):
                         message_text = action
                         messages.success(request, _(message_text))
 
-                        if counter != len(data["board_list"]) - 1:
+                        if counter != len(data["device_list"]) - 1:
                             counter += 1
                         else:
                             return True
 
                     except Exception:
-                        message_text = "Unable to stop plugin on board " \
+                        message_text = "Unable to stop plugin on device " \
                                        + str(value) + "."
                         exceptions.handle(request, _(message_text))
 
@@ -286,11 +286,11 @@ class CallPluginForm(forms.SelfHandlingForm):
         widget=forms.TextInput(attrs={'readonly': 'readonly'})
     )
 
-    board_list = forms.MultipleChoiceField(
-        label=_("Boards List"),
+    device_list = forms.MultipleChoiceField(
+        label=_("Devices List"),
         widget=forms.SelectMultiple(
-            attrs={'class': 'switchable', 'data-slug': 'slug-call-boards'}),
-        help_text=_("Select boards in this pool ")
+            attrs={'class': 'switchable', 'data-slug': 'slug-call-devices'}),
+        help_text=_("Select devices in this pool ")
     )
 
     parameters = forms.CharField(
@@ -307,10 +307,10 @@ class CallPluginForm(forms.SelfHandlingForm):
         super(CallPluginForm, self).__init__(*args, **kwargs)
         # input=kwargs.get('initial',{})
 
-        boardslist_length = len(kwargs["initial"]["board_list"])
+        deviceslist_length = len(kwargs["initial"]["device_list"])
 
-        self.fields["board_list"].choices = kwargs["initial"]["board_list"]
-        self.fields["board_list"].max_length = boardslist_length
+        self.fields["device_list"].choices = kwargs["initial"]["device_list"]
+        self.fields["device_list"].max_length = deviceslist_length
 
     def handle(self, request, data):
 
@@ -321,9 +321,9 @@ class CallPluginForm(forms.SelfHandlingForm):
         else:
             data["parameters"] = json.loads(data["parameters"])
 
-        for board in data["board_list"]:
-            for key, value in self.fields["board_list"].choices:
-                if key == board:
+        for device in data["device_list"]:
+            for key, value in self.fields["device_list"].choices:
+                if key == device:
 
                     try:
                         action = iotronic.plugin_action(request, key,
@@ -334,13 +334,13 @@ class CallPluginForm(forms.SelfHandlingForm):
                         message_text = action
                         messages.success(request, _(message_text))
 
-                        if counter != len(data["board_list"]) - 1:
+                        if counter != len(data["device_list"]) - 1:
                             counter += 1
                         else:
                             return True
 
                     except Exception:
-                        message_text = "Unable to call plugin on board " \
+                        message_text = "Unable to call plugin on device " \
                                        + str(value) + "."
                         exceptions.handle(request, _(message_text))
 
@@ -356,11 +356,11 @@ class RemovePluginForm(forms.SelfHandlingForm):
         widget=forms.TextInput(attrs={'readonly': 'readonly'})
     )
 
-    board_list = forms.MultipleChoiceField(
-        label=_("Boards List"),
+    device_list = forms.MultipleChoiceField(
+        label=_("Devices List"),
         widget=forms.SelectMultiple(
-            attrs={'class': 'switchable', 'data-slug': 'slug-remove-boards'}),
-        help_text=_("Select boards in this pool ")
+            attrs={'class': 'switchable', 'data-slug': 'slug-remove-devices'}),
+        help_text=_("Select devices in this pool ")
     )
 
     def __init__(self, *args, **kwargs):
@@ -368,18 +368,18 @@ class RemovePluginForm(forms.SelfHandlingForm):
         super(RemovePluginForm, self).__init__(*args, **kwargs)
         # input=kwargs.get('initial',{})
 
-        boardslist_length = len(kwargs["initial"]["board_list"])
+        deviceslist_length = len(kwargs["initial"]["device_list"])
 
-        self.fields["board_list"].choices = kwargs["initial"]["board_list"]
-        self.fields["board_list"].max_length = boardslist_length
+        self.fields["device_list"].choices = kwargs["initial"]["device_list"]
+        self.fields["device_list"].max_length = deviceslist_length
 
     def handle(self, request, data):
 
         counter = 0
 
-        for board in data["board_list"]:
-            for key, value in self.fields["board_list"].choices:
-                if key == board:
+        for device in data["device_list"]:
+            for key, value in self.fields["device_list"].choices:
+                if key == device:
 
                     try:
                         iotronic.plugin_remove(request,
@@ -387,16 +387,16 @@ class RemovePluginForm(forms.SelfHandlingForm):
                                                data["uuid"])
                         # LOG.debug("API: %s %s", plugin, request)
                         message_text = "Plugin removed successfully from" \
-                                       + " board " + str(value) + "."
+                                       + " device " + str(value) + "."
                         messages.success(request, _(message_text))
 
-                        if counter != len(data["board_list"]) - 1:
+                        if counter != len(data["device_list"]) - 1:
                             counter += 1
                         else:
                             return True
 
                     except Exception:
-                        message_text = "Unable to remove plugin from board " \
+                        message_text = "Unable to remove plugin from device " \
                                        + str(value) + "."
                         exceptions.handle(request, _(message_text))
 

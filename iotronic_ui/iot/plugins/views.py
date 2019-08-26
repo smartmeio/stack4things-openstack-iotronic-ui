@@ -42,7 +42,7 @@ class IndexView(tables.DataTableView):
     def get_data(self):
         plugins = []
         users = []
-
+        LOG.debug("REQUEST: %s", self.request)
         # Admin
         if policy.check((("iot", "iot:list_all_plugins"),), self.request):
             try:
@@ -128,17 +128,17 @@ class InjectView(forms.ModalFormView):
     def get_initial(self):
         plugin = self.get_object()
 
-        # Populate boards
-        boards = iotronic.board_list(self.request, "online", None, None)
-        boards.sort(key=lambda b: b.name)
+        # Populate devices
+        devices = iotronic.device_list(self.request, "online", None, None)
+        devices.sort(key=lambda b: b.name)
 
-        board_list = []
-        for board in boards:
-            board_list.append((board.uuid, _(board.name)))
+        device_list = []
+        for device in devices:
+            device_list.append((device.uuid, _(device.name)))
 
         return {'uuid': plugin.uuid,
                 'name': plugin.name,
-                'board_list': board_list}
+                'device_list': device_list}
 
 
 class StartView(forms.ModalFormView):
@@ -172,17 +172,17 @@ class StartView(forms.ModalFormView):
     def get_initial(self):
         plugin = self.get_object()
 
-        # Populate boards
-        boards = iotronic.board_list(self.request, "online", None, None)
-        boards.sort(key=lambda b: b.name)
+        # Populate devices
+        devices = iotronic.device_list(self.request, "online", None, None)
+        devices.sort(key=lambda b: b.name)
 
-        board_list = []
-        for board in boards:
-            board_list.append((board.uuid, _(board.name)))
+        device_list = []
+        for device in devices:
+            device_list.append((device.uuid, _(device.name)))
 
         return {'uuid': plugin.uuid,
                 'name': plugin.name,
-                'board_list': board_list}
+                'device_list': device_list}
 
 
 class StopView(forms.ModalFormView):
@@ -216,17 +216,17 @@ class StopView(forms.ModalFormView):
     def get_initial(self):
         plugin = self.get_object()
 
-        # Populate boards
-        boards = iotronic.board_list(self.request, "online", None, None)
-        boards.sort(key=lambda b: b.name)
+        # Populate devices
+        devices = iotronic.device_list(self.request, "online", None, None)
+        devices.sort(key=lambda b: b.name)
 
-        board_list = []
-        for board in boards:
-            board_list.append((board.uuid, _(board.name)))
+        device_list = []
+        for device in devices:
+            device_list.append((device.uuid, _(device.name)))
 
         return {'uuid': plugin.uuid,
                 'name': plugin.name,
-                'board_list': board_list}
+                'device_list': device_list}
 
 
 class CallView(forms.ModalFormView):
@@ -260,17 +260,17 @@ class CallView(forms.ModalFormView):
     def get_initial(self):
         plugin = self.get_object()
 
-        # Populate boards
-        boards = iotronic.board_list(self.request, "online", None, None)
-        boards.sort(key=lambda b: b.name)
+        # Populate devices
+        devices = iotronic.device_list(self.request, "online", None, None)
+        devices.sort(key=lambda b: b.name)
 
-        board_list = []
-        for board in boards:
-            board_list.append((board.uuid, _(board.name)))
+        device_list = []
+        for device in devices:
+            device_list.append((device.uuid, _(device.name)))
 
         return {'uuid': plugin.uuid,
                 'name': plugin.name,
-                'board_list': board_list}
+                'device_list': device_list}
 
 
 class RemoveView(forms.ModalFormView):
@@ -304,17 +304,17 @@ class RemoveView(forms.ModalFormView):
     def get_initial(self):
         plugin = self.get_object()
 
-        # Populate boards
-        boards = iotronic.board_list(self.request, "online", None, None)
-        boards.sort(key=lambda b: b.name)
+        # Populate devices
+        devices = iotronic.device_list(self.request, "online", None, None)
+        devices.sort(key=lambda b: b.name)
 
-        board_list = []
-        for board in boards:
-            board_list.append((board.uuid, _(board.name)))
+        device_list = []
+        for device in devices:
+            device_list.append((device.uuid, _(device.name)))
 
         return {'uuid': plugin.uuid,
                 'name': plugin.name,
-                'board_list': board_list}
+                'device_list': device_list}
 
 
 class UpdateView(forms.ModalFormView):

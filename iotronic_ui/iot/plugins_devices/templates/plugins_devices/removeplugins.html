@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Remove plugin(s) from this device." %}{% endblock %}
+
+{% block main %}
+    {% include 'iot/plugins_devices/_removeplugins.html' %}
+{% endblock %}

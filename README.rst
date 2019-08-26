@@ -18,7 +18,7 @@ Manual Installation
 Begin by cloning the Horizon and IoTronic Panels repositories::
 
     git clone https://github.com/openstack/horizon.git
-    git clone https://github.com/openstack/iotronic-ui.git
+    git clone https://git.smartme.io/smartme.io/stack4things/IoTronic-UI/iotronic-ui.git
 
 Install IoTronic Panels with all the dependencies::
 

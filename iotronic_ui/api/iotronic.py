@@ -1,17 +1,18 @@
-# Licensed under the Apache License, Version 2.0 (the "License"); you may
-# not use this file except in compliance with the License. You may obtain
-# a copy of the License at
+# Copyright 2017-2019 MDSLAB - University of Messina All Rights Reserved.
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-# License for the specific language governing permissions and limitations
-# under the License.
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
 
-# from collections import OrderedDict
-# import threading
+author = "Carmelo Romeo <carmelo.romeo85@gmail.com>"
 
 from iotronicclient import client as iotronic_client
 # from django.conf import settings
@@ -71,6 +72,44 @@ def board_delete(request, board_id):
     iotronicclient(request).board.delete(board_id)
 
 
+# DEVICE MANAGEMENT
+def device_list(request, status=None, detail=None, project=None):
+    """List devices."""
+    return iotronicclient(request).board.list(status, detail, project)
+
+
+def device_get(request, device_id, fields):
+    """Get device info."""
+    return iotronicclient(request).board.get(device_id, fields)
+
+
+def device_create(request, code, mobile, location, type, name):
+    """Create device."""
+    params = {"code": code,
+              "mobile": mobile,
+              "location": location,
+              "type": type,
+              "name": name}
+    iotronicclient(request).board.create(**params)
+
+
+def device_update(request, device_id, patch):
+    """Update device."""
+    iotronicclient(request).board.update(device_id, patch)
+
+
+def device_delete(request, device_id):
+    """Delete device."""
+    iotronicclient(request).board.delete(device_id)
+
+
+def device_action(request, device_id, action, parameters):
+    """Action on device."""
+    return iotronicclient(request).board.board_action(device_id,
+                                                      action,
+                                                      parameters)
+
+
 # PLUGIN MANAGEMENT (Cloud Side)
 def plugin_list(request, detail=None, project=None, with_public=False,
                 all_plugins=False):
@@ -107,22 +146,22 @@ def plugin_delete(request, plugin_id):
 
 
 # PLUGIN MANAGEMENT (Board Side)
-def plugin_inject(request, board_id, plugin_id, onboot):
-    """Inject plugin on board(s)."""
-    return iotronicclient(request).plugin_injection.plugin_inject(board_id,
+def plugin_inject(request, device_id, plugin_id, onboot):
+    """Inject plugin on device."""
+    return iotronicclient(request).plugin_injection.plugin_inject(device_id,
                                                                   plugin_id,
                                                                   onboot)
 
 
-def plugin_action(request, board_id, plugin_id, action, params={}):
-    """Start/Stop/Call actions on board(s)."""
+def plugin_action(request, device_id, plugin_id, action, params={}):
+    """Start/Stop/Call actions on device."""
     return iotronicclient(request).plugin_injection.plugin_action(
-        board_id, plugin_id, action, params)
+        device_id, plugin_id, action, params)
 
 
-def plugin_remove(request, board_id, plugin_id):
-    """Remove plugin from board."""
-    iotronicclient(request).plugin_injection.plugin_remove(board_id,
+def plugin_remove(request, device_id, plugin_id):
+    """Remove plugin from device."""
+    iotronicclient(request).plugin_injection.plugin_remove(device_id,
                                                            plugin_id)
 
 
@@ -139,6 +178,27 @@ def plugins_on_board(request, board_id):
         detailed_plugins.append({"name": details._info["name"],
                                  "id": plugin.plugin})
 
+    return detailed_plugins
+
+
+def plugins_on_device(request, device_id):
+    """Plugins on device."""
+    plugins = iotronicclient(request).plugin_injection.plugins_on_board(
+        device_id)
+
+    detailed_plugins = []
+    fields = {"name", "public", "callable"}
+    # fields = {"name"}
+    for plugin in plugins:
+        details = iotronicclient(request).plugin.get(plugin.plugin, fields)
+        details._info[u"uuid"] = plugin.plugin
+        """
+        detailed_plugins.append({"name": details._info["name"],
+                                 "public": details._info["public"],
+                                 "callable": details._info["callable"],
+                                 "uuid": plugin.plugin})
+        """
+        detailed_plugins.append(details)
     return detailed_plugins
 
 
@@ -197,34 +257,60 @@ def services_on_board(request, board_id, detail=False):
         return services
 
 
-def service_action(request, board_id, service_id, action):
+def services_on_device(request, device_id, detail=False):
+    """List services on device."""
+    services = iotronicclient(request).exposed_service.services_on_board(
+        device_id)
+
+    if detail:
+        detailed_services = []
+        fields = {"name", "port", "protocol"}
+
+        for service in services:
+            details = iotronicclient(request).service.get(
+                service._info["service"], fields)
+
+            detailed_services.append({"uuid": service._info["service"],
+                                      "name": details._info["name"],
+                                      "public_port":
+                                          service._info["public_port"],
+                                      "port": details._info["port"],
+                                      "protocol": details._info["protocol"]})
+
+        return detailed_services
+
+    else:
+        return services
+
+
+def service_action(request, device_id, service_id, action):
     """Action on service."""
-    return iotronicclient(request).exposed_service.service_action(board_id,
+    return iotronicclient(request).exposed_service.service_action(device_id,
                                                                   service_id,
                                                                   action)
 
 
-def restore_services(request, board_id):
+def restore_services(request, device_id):
     """Restore services."""
-    return iotronicclient(request).exposed_service.restore_services(board_id)
+    return iotronicclient(request).exposed_service.restore_services(device_id)
 
 
 # PORTS MANAGEMENT
-def port_list(request, board_id):
-    """Get ports attached to a board."""
+def port_list(request, device_id):
+    """Get ports attached to a device."""
     return iotronicclient(request).port.list()
 
 
-def attach_port(request, board_id, network_id, subnet_id):
-    """Attach port to a subnet for a board."""
-    return iotronicclient(request).portonboard.attach_port(board_id,
+def attach_port(request, device_id, network_id, subnet_id):
+    """Attach port to a subnet for a device."""
+    return iotronicclient(request).portonboard.attach_port(device_id,
                                                            network_id,
                                                            subnet_id)
 
 
-def detach_port(request, board_id, port_id):
-    """Detach port from the board."""
-    iotronicclient(request).portonboard.detach_port(board_id, port_id)
+def detach_port(request, device_id, port_id):
+    """Detach port from the device."""
+    iotronicclient(request).portonboard.detach_port(device_id, port_id)
 
 
 # FLEETS MANAGEMENT
@@ -256,8 +342,8 @@ def fleet_update(request, fleet_id, patch):
     iotronicclient(request).fleet.update(fleet_id, patch)
 
 
-def fleet_get_boards(request, fleet_id):
-    """Get fleet boards."""
+def fleet_get_devices(request, fleet_id):
+    """Get fleet devices."""
     return iotronicclient(request).fleet.boards_in_fleet(fleet=fleet_id)
 
 
@@ -272,14 +358,14 @@ def webservice_enabled_list(request):
     return iotronicclient(request).enabledwebservice.list()
 
 
-def webservice_get_enabled_info(request, board_id, detail=None):
+def webservice_get_enabled_info(request, device_id, detail=None):
     """Get the information of the enabled webservices."""
     ws_info = []
 
     ws_enabled = iotronicclient(request).enabledwebservice.list()
 
     for ws in ws_enabled:
-        if ws.board_uuid == board_id:
+        if ws.board_uuid == device_id:
             ws_info = ws
             break
 
@@ -302,35 +388,51 @@ def webservices_on_board(request, board_id, fields=None):
     return detailed_webservices
 
 
+def webservices_on_device(request, device_id, fields=None):
+    """Get web services on device list."""
+    webservices = iotronicclient(request).webserviceonboard.list(device_id,
+                                                                 fields)
+
+    detailed_webservices = []
+    # fields = {"name", "port", "uuid"}
+
+    for ws in webservices:
+        detailed_webservices.append({"name": ws._info["name"],
+                                     "port": ws._info["port"],
+                                     "uuid": ws._info["uuid"]})
+
+    return detailed_webservices
+
+
 def webservice_get(request, webservice_id, fields):
     """Get web service info."""
     return iotronicclient(request).webservice.get(webservice_id, fields)
 
 
-def webservice_expose(request, board_id, name, port, secure):
+def webservice_expose(request, device, name, port, secure):
     """Expose a web service."""
-    return iotronicclient(request).webserviceonboard.expose(board_id,
+    return iotronicclient(request).webserviceonboard.expose(device,
                                                             name,
                                                             port,
                                                             secure)
 
 
 def webservice_unexpose(request, webservice_id):
-    """Unexpose a web service from a board."""
+    """Unexpose a web service from a device."""
     return iotronicclient(request).webservice.delete(webservice_id)
 
 
-def webservice_enable(request, board, dns, zone, email):
+def webservice_enable(request, dev, dns, zone, email):
     """Enable web service."""
-    return iotronicclient(request).webserviceonboard.enable_webservice(board,
+    return iotronicclient(request).webserviceonboard.enable_webservice(dev,
                                                                        dns,
                                                                        zone,
                                                                        email)
 
 
-def webservice_disable(request, board):
+def webservice_disable(request, dev):
     """Disable web service."""
-    return iotronicclient(request).webserviceonboard.disable_webservice(board)
+    return iotronicclient(request).webserviceonboard.disable_webservice(dev)
 
 
 def boards_no_webservice(request):

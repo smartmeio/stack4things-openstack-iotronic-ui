@@ -82,6 +82,24 @@ def show_webservices(board_info):
                                             context)
 
 
+class RestoreServices(tables.BatchAction):
+    name = "restoreservices"
+
+    @staticmethod
+    def action_present(count):
+        return u"Restore ALL Services"
+
+    @staticmethod
+    def action_past(count):
+        return u"Restored ALL Services"
+
+    def allowed(self, request, device=None):
+        return True
+
+    def action(self, request, device_id):
+        api.iotronic.restore_services(request, device_id)
+
+
 class WebservicesTable(tables.DataTable):
 
     """
@@ -90,10 +108,13 @@ class WebservicesTable(tables.DataTable):
                                  verbose_name=_('UUID'))
     """
     board = tables.Column('name', verbose_name=_('Board Name'))
+    status = tables.Column('status', verbose_name=_('Status'))
 
     board_uuid = tables.Column('board_uuid', 
                                verbose_name=_('Board UUID'),
                                hidden=True)
+
+    # ssh = tables.Column('ssh', verbose_name=_('SSH Access'))
 
     webservices = tables.Column(show_webservices,
                                 verbose_name=_('Web Services'))
@@ -116,6 +137,6 @@ class WebservicesTable(tables.DataTable):
                        DisableWebservicesAction)
         table_actions = (WebserviceFilterAction, DisableWebservicesAction)
         """
-        row_actions = (ExposeWebserviceLink,
-                       UnexposeWebserviceLink)
+        row_actions = (ExposeWebserviceLink, UnexposeWebserviceLink,
+                       RestoreServices,)
         table_actions = (WebserviceFilterAction,)

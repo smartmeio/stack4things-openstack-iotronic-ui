@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Reboot the device" %}{% endblock %}
+
+{% block main %}
+    {% include 'iot/devices/_reboot.html' %}
+{% endblock %}

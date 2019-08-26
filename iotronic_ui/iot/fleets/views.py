@@ -146,7 +146,7 @@ class DetailView(tabs.TabView):
         fleet_id = self.kwargs['fleet_id']
         try:
             fleet = iotronic.fleet_get(self.request, fleet_id, None)
-            boards = iotronic.fleet_get_boards(self.request, fleet_id)
+            boards = iotronic.fleet_get_devices(self.request, fleet_id)
 
             # LOG.debug('Boards: %s', boards)
 

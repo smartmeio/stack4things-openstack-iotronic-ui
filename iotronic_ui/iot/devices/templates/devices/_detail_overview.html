@@ -1,0 +1,137 @@
+{% load i18n sizeformat %}
+
+<div class="detail">
+
+  <h4>{% trans "Info" %}</h4>
+    <hr class="header_rule">
+    <dl class="dl-horizontal">
+      <dt>{% trans "Name" %}</dt>
+      <dd>{{ device.name }}</dd>
+      <dt>{% trans "Status" %}</dt>
+      <dd>{{ device.status }}</dd>
+      <dt>{% trans "Type" %}</dt>
+      <dd>{{ device.type }}</dd>
+      <dt>{% trans "ID" %}</dt>
+      <dd>{{ device.uuid }}</dd>
+      <dt>{% trans "LR version" %}</dt>
+      <dd>{{ device.lr_version }}</dd>
+      <dt>{% trans "WAMP Agent" %}</dt>
+      <dd>{{ device.agent }}</dd>
+      <dt>{% trans "Code" %}</dt>
+      <dd>{{ device.code }}</dd>
+      <dt>{% trans "Creation data" %}</dt>
+      <dd>{{ device.created_at }}</dd>
+      <dt>{% trans "Location" %}</dt>
+      <dd>Latitude: {{ coordinates.latitude }}</dd>
+      <dd>Longitude: {{ coordinates.longitude }}</dd>
+      <dd>Altitude: {{ coordinates.altitude }}</dd>
+      <dt>{% trans "Connectivity" %}</dt>
+      {% if device.connectivity.mac %}
+          <dd>MAC: {{ device.connectivity.mac }}</dd>
+          <dd>Interface: {{ device.connectivity.iface }}</dd>
+          <dd>Local IP: {{ device.connectivity.local_ip }}</dd>
+      {% else %}
+          <dd>--</dd>
+      {% endif %}
+      <dt>{% trans "Mobile" %}</dt>
+      <dd>{{ device.mobile }}</dd>
+      <dt>{% trans "Extra" %}</dt>
+      <dd>{{ device.extra }}</dd>
+      <dt>{% trans "Fleet Name" %}</dt>
+      <dd>{{ device.fleet_name }}</dd>
+      <dt>{% trans "Fleet ID" %}</dt>
+      <dd>{{ device.fleet }}</dd>
+    </dl>
+
+  <h4>{% trans "Ports" %}</h4>
+    <hr class="header_rule">
+    <dl class="dl-horizontal">
+      {% if ports %}
+          {% for port in ports %}
+              <dt>{{ port.VIF_name }}</dt>
+              <dd>{{ port.ip }}</dd>
+          {% endfor %}
+      {% else %}
+          <dd>--</dd>
+      {% endif %}
+    </dl>
+
+  <h4>{% trans "Services" %}</h4>
+    <hr class="header_rule">
+    <dl class="dl-horizontal">
+      {% if services %}
+        {% for service in services %}
+            <!--
+            <dt>{{ service.name }} [{{ service.protocol }}] {{ service.port }}</dt>
+            <dd>{{ service.public_port }}</dd>
+            -->
+            <!--
+            <dt>{{ service.name }}</dt>
+            <dd>[{{ service.protocol }}] L: {{ service.port }}; P: {{ service.public_port }}</dd>
+            -->
+            <dt>{{ service.name }}</dt>
+            {% if service.name == "ssh" %}
+                <dd>ssh -p {{ service.public_port}} root@{{ service.wstun_ip }}</dd>
+            {% elif service.name == "nodered" %}
+                <dd><a href="http://{{ service.wstun_ip }}:{{ service.public_port }}" target="_blank">http://{{ service.wstun_ip }}:{{ service.public_port }}</a></dd>
+            {% else %}
+                <dd>{{ service.name }} [{{ service.protocol }}] {{ service.port }} --> {{ service.public_port }}</dd>
+            {% endif %}
+        {% endfor %}
+      {% else %}
+        <dd>--</dd>
+      {% endif %}
+    </dl>
+
+  <h4>{% trans "Web Services" %}</h4>
+    <hr class="header_rule">
+    <dl class="dl-horizontal">
+      {% if webservices %}
+        {% for ws in webservices %}
+            <dt>{{ ws.name }} [{{ ws.port }}]</dt>
+            <dd>{{ ws.uuid }}</dd>
+        {% endfor %}
+      {% else %}
+        <dd>--</dd>
+      {% endif %}
+    </dl>
+
+  <h4>{% trans "Plugins" %}</h4>
+    <hr class="header_rule">
+    <dl class="dl-horizontal">
+      {% if plugins %}
+          {% for plugin in plugins %}
+              <dt>{{ plugin.name }}</dt>
+              <dd>{{ plugin.id }}</dd>
+          {% endfor %}
+      {% else %}
+          <dd>--</dd>
+      {% endif %}
+    </dl>
+</div>
+
+<!--<div id="mapdiv" style="min-height:300px; margin-bottom: 10px;" data-coordinates='[{"latitude": "{{ coordinates.latitude }}", "longitude": "{{ coordinates.longitude }}", "altitude": "{{ coordinates.altitude }}"}]'>-->
+<!--
+<div id="mapdiv" style="min-height:300px; margin-bottom: 10px;">
+	<script>
+		$(document).ready(function(){
+			/*
+			coordinates = JSON.parse(document.getElementById("mapdiv").getAttribute("data-coordinates"));
+			lat = coordinates[0]["latitude"];
+			lon = coordinates[0]["longitude"];
+			alt = coordinates[0]["altitude"];
+			*/
+			var lat = "{{ coordinates.latitude }}";
+			var lon = "{{ coordinates.longitude }}";
+			var alt = "{{ coordinates.altitude }}";
+			var label = "{{ board.name }}";
+			var status = "{{ board.status }}";
+			var updated = "{{ board.updated_at }}";
+
+			var array_coord = {"coordinates" : [{"lat": lat, "lon": lon, "alt": alt, "updated": updated, "label": label, "status": status}]}
+
+			render_map("mapdiv", array_coord);
+		});
+	</script>
+</div>
+-->

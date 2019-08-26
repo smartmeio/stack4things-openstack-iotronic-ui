@@ -1,0 +1,16 @@
+{% load i18n %}
+{% if services %}
+    {% for service in services %}
+        {% if service.name == "ssh" %}
+            <dd>ssh -p {{ service.public_port}} root@{{ service.wstun_ip }}</dd>
+        {% elif service.name == "nodered" %}
+            <dd>https://nodered.bla.bla.eu</dd>
+        {% elif service.name == "http" %}
+            <dd>https://{{ service.wstun_ip }}:{{ service.public_port }}</dd>
+        {% else %}
+            <dd>{{ service.name }} [{{ service.protocol }}] {{ service.port }} --> {{ service.public_port }}</dd>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <dd>--</dd>
+{% endif %}

@@ -80,8 +80,25 @@ class IndexView(tables.DataTableView):
         # Append some information to the webservice
         # LOG.debug('WSS: %s', webservices)
         for ws_en in en_webservices:
+            board = iotronic.board_get(self.request, ws_en.board_uuid, None)
+            """
+            services = iotronic.services_on_board(self.request,
+                                                  ws_en.board_uuid,
+                                                  True)
+            LOG.debug('SERVICES: %s', services)
+            
+            ssh_access = "--"
+            for service in services:
+                if (service["name"] == "ssh"):
+                    ssh_access = "ssh -p " + str(service["public_port"]) +\
+                                 " root@x.x.x.x"
+                    break
+            """
 
             ws_list = []
+            ws_list.append({"local_port": "LR", 
+                            "service_url": "https://" + ws_en.dns + "." +\
+                            ws_en.zone})
 
             for ws in webservices:
                 if ws_en.board_uuid == ws.board_uuid:
@@ -93,8 +110,10 @@ class IndexView(tables.DataTableView):
 
                     ws_en.uuid = ws.uuid
 
-            board = iotronic.board_get(self.request, ws_en.board_uuid, None)
+            # board = iotronic.board_get(self.request, ws_en.board_uuid, None)
             ws_en.name = board.name
+            ws_en.status = board.status
+            # ws_en.ssh = ssh_access
             ws_en._info.update(dict(webservices=ws_list))
 
         return en_webservices
