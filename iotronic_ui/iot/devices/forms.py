@@ -40,8 +40,10 @@ class CreateDeviceForm(forms.SelfHandlingForm):
     # MODIFY ---> options: yun, server
     type = forms.ChoiceField(
         label=_("Type"),
-        # choices=[('yun', _('YUN')), ('server', _('Server'))],
-        choices=[('gateway', _('Gateway')), ('server', _('Server'))],
+        # choices=[('gateway', _('Gateway')), ('server', _('Server'))],
+        choices=[('raspberry', _('Arancino')), ('yun', _('Arduino YUN')), 
+            ('generic', _('Generic')), ('raspberry', _('Raspberry')),
+            ('server', _('Server'))],
         widget=forms.Select(
             attrs={'class': 'switchable', 'data-slug': 'slug-type'},
         )
@@ -385,6 +387,55 @@ class PackageActionDeviceForm(forms.SelfHandlingForm):
         except Exception:
             message_text = "Unable to call package action " \
                            + "DevicePkgOperation on device " \
+                           + str(data["name"]) + "."
+            exceptions.handle(request, _(message_text))
+
+
+class MountActionDeviceForm(forms.SelfHandlingForm):
+
+    uuid = forms.CharField(label=_("Device ID"), widget=forms.HiddenInput)
+
+    name = forms.CharField(
+        label=_('Device Name'),
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+
+    # mount_action_list = forms.MultipleChoiceField(
+    mount_action_list = forms.ChoiceField(
+        label=_("Mount actions List"),
+        # widget=forms.SelectMultiple(
+        widget=forms.Select(
+            attrs={'class': 'switchable',
+                   'data-slug': 'slug-mountaction-device'}),
+        help_text=_("Select action in this pool ")
+    )
+
+    def __init__(self, *args, **kwargs):
+
+        super(MountActionDeviceForm, self).__init__(*args, **kwargs)
+        # input=kwargs.get('initial',{})
+
+        mount_actions = kwargs["initial"]["mount_action_list"]
+        self.fields["mount_action_list"].choices = mount_actions
+
+    def handle(self, request, data):
+
+        counter = 0
+
+        data["parameters"] = {"mnt_cmd": data["mount_action_list"]}
+
+        try:
+            action = iotronic.device_action(request,
+                                            data["uuid"],
+                                            "DeviceMountFs",
+                                            data["parameters"])
+            message_text = action
+            messages.success(request, _(message_text))
+            return True
+
+        except Exception:
+            message_text = "Unable to call action " \
+                           + str(data["mount_action_list"]) + " on device " \
                            + str(data["name"]) + "."
             exceptions.handle(request, _(message_text))
 
