@@ -14,7 +14,7 @@
 
 author = "Carmelo Romeo <carmelo.romeo85@gmail.com>"
 
-import cPickle
+import _pickle as cPickle
 import json
 import logging
 

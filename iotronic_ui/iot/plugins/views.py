@@ -10,7 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import cPickle
+import _pickle as cPickle
 import logging
 
 from django.urls import reverse
